@@ -247,3 +247,130 @@ Examples:
 * Don't rely on the data producers
 * Put limits into other application-level protocols
 * Just make sure your system can handle accidental huge collections of data
+
+### Chapter 5: Stability Patterns
+
+#### Timeouts
+* Networks are fallible
+* Resource pools and thread blocks should have timeouts to ensure that calling threads will be unblocked
+* Group sets of operations into query objects (see EAA patterns)
+* Use generic gateway to provide template for connection handling, error handling, query execution and result processing (one place setup)
+* Amazon API Gateway can handle details
+* Don't retry immediately - it's a waste of resources. Fast retries are very likely to fail again
+* From client's perspective, waiting longer is a bad thing. It keeps resources busy longer than needed.
+* Use queue-and-retry instead if possible
+* Timeouts have synergy with circuit breakers
+* Timeouts and Fail Fast address latency problems
+* Fail Fast - for incoming requests
+* Timeouts - for outbound requests
+* Apply for: Integration Points, Blocked Threads, and Slow Responses
+
+#### Circuit Breakers
+* It's like circuit breakers in electrical systems
+* Use it to wrap dangerous operations (Don't call a provider if it hurts)
+* States: Closed, Open, Half-Open
+* It's a way to automatically degrade the system when it's under stress
+* We usually more interested in the fault density than the total count
+* Leaky Bucket - a pattern for smarter CB
+* Changes in CB should be logged for alerts and monitoring
+* There should be some way to manually reset the CB
+* !!! CB should be built at the scope of the process (each instance of the service discover problems independently - to avoid out-process communication)
+* Use together with Timeouts
+
+#### Bulkheads
+* Bulkheads are a way to isolate the failure of one part of the system from the rest of the system
+* Redundant VMs are not quite as robust as redundant physical machines - they do not ensure physical isolation
+* At large scale, a mission-critical service might be done as several independent farms of servers where some servers reserved by critical apps
+* In the cloud - run instances in different availability zones
+* Hidden dependencies - two services that are not directly connected, but they share a common resource
+* Useful to partition the threads inside a process (e.g. reserve threads in the pool for admin use)
+* Pick a useful granularity: threads in the connection pool, CPUs in a server, servers in a cluster, etc.
+
+#### Steady State
+* Keep people off production systems (avoid fiddling)
+* Computing resources are always finite
+* The Steady State pattern says that for every mechanism that accumulates a resource, some other mechanism must recycle that resource
+
+1. Data Purging
+* Symptom of data growth: increasing I/O rates on the database, increasing latency
+* Purge data with app logic (will it be functional after data is purged?)
+2. Log Files
+* Don't keep logs forever
+* Use rotation based on size
+* If it required by compliance, use a separate system for storing logs data
+3. In-Memory Caching
+* Is the space of possible cache keys finite or infinite? (user limits of keys)
+* Do the cached items ever change? (they can be huge)
+* Simple mechanism - time-based expiration (fits 99% of cases)
+
+#### Fail Fast
+* Slow responses are worse than no response. The worst - slow failure response
+* If LB has a queue for connections to execute late (in hope of recovery), it's a violation of the Fail Fast principle
+* Check availability of resources before you start using them
+* Report a system failures differently than an application failure (for the upstream systems)
+* Use simple input validation before validating the business logic and starting the business transaction
+
+#### Let It Crash
+* Sometimes the best thing to create system stability is to abandon the component-level stability
+* The Let It Crash pattern says that error recovery id difficult and unreliable, so our goal is to get back to a known state as quickly as possible
+* Conditions
+  * Limited Granularity
+  * Fast Replacement
+  * Supervision
+  * Reintegration
+* Restart and reintegrate
+* Isolate components to crash independently
+* Don't crash monoliths (heavy runtimes or long startup)
+
+#### Handshaking
+* Handshaking - signals between devices that regulate communication between them
+* It rarely exists at the application level
+* It's most valuable when unbalanced capacity are leading to slow responses
+* Build clients and servers to perfom handshaking (cooperative demand control)
+* Consider health checks in clustered or load-balanced services
+
+#### Test Harnesses
+* Build a test harness that substitutes for the remote end of every web service call
+* Hint: different ports for different sets of misbehavior
+* Emulate out-of-spec failures
+* Stress the caller: slow responses, no responses, garbage responses
+* Leverage shared harnesses for common failures for different integration points (subclass the harness)
+* It's a supplement to other testing techniques
+
+#### Decoupling Middleware
+* Done well, it integrates and decouples services at the same time
+* It's architectural decision - hard to change later
+* It allows to avoid most of the problems of integration points
+* Choose proper architectural style
+
+#### Shed Load
+* The world can always make more load than you can handle
+* Model TCP's approach - when load gets too high, start to refuse requests for work
+* Make the app to monitor its own performance
+* It's related to the Fail Fast
+* Whit LB instance can use 503 status code (shock absorber)
+* Inside the boundaries of the system or enterprise, it's more efficient to use Back Pressure
+
+#### Create Back Pressure
+* If a queue is unbounded, in can consume all available memory
+* BP creates safety by slowing down consumers to not crash the provider
+* Apply within a system boundary
+* Apply Shed Load inside the system
+* Queues must be finite for response times to be finite
+* We don't want unbounded queues in our system.
+* We have to decide what to do when the queue is full
+  * Accept new item but drop it on th floor
+  * Accept new item but drop the oldest item
+  * Refuse new item
+  * Block the caller until there is space in the queue
+* If data value decreases with age, dropping oldest ones is a good idea
+* It's important do distinguish back pressure due to load and back pressure due to failure
+
+#### Governor
+* The Governor limits the speed of an "engine"
+* Create one to slow th rate of actions (e.g. autoscaler can only shut down a certain number of instances per minute)
+* A Governor is stateful and time-aware
+* The whole point is to slow things down to give humans time to get involved
+* Apply resistance to the unsafe directions (U-shaped curve)
+
+### Chapter 6: 
