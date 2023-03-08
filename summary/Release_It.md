@@ -427,3 +427,77 @@ Examples:
   * Use bastion and jumphosts to access individual VMs
 * Containers in the Cloud
   * The biggest challenge is to connect all the containers together
+
+#### Chapter 8: Processes on Machines
+* Every machine needs the right code, configuration, and network connections
+* Vocab:
+  * Service
+  * Instance
+  * Executable
+  * Process
+  * Installation
+  * Deployment
+
+1. Code
+* Developers must be able to build the system, run test, and run the system locally (at least a portion)
+* Consider moving dependencies to the private registry
+* Beware of the plugins to the build system (security concerns)
+* Developers should not do production builds locally. Local environments are usually contaminated
+* Only make production builds on a CI server
+
+2. Immutable and Disposable Infrastructure
+* It's more reliable to always start from known base image, apply a fixed set of changes, and then never attempt to patch the image/machine
+
+3. Configuration
+* Every piece of production software requires configurable properties
+* Some of them changes (even from instance to instance), some of them don't - keep separately
+* The code should look outside the deployment directory for configuration
+* Sensitive information should be protected and not stored in the version control system
+* Usage with disposable infrastructure:
+  * Inject configuration into the container at startup
+  * User configuration server
+* Configuration server should by highly available
+* Name properties obvious way
+
+4. Transparency
+* Transparency allows operators, developers, business users to gain understanding of the system's historical trends, current state, and future behavior
+* Debugging a transparent system is easier
+* A system wihtout it cannot survive long
+
+1. Designing for Transparency
+* It's architecture decision - harder to implement later
+* The monitoring and reporting systems should be like an exoskeleton around the system
+
+2. Enabling Technologies
+* The process tells nothing about itself
+* Black Box: observer is outside the system
+* White Box: observer is inside the process (often like an agent delivered in a language-specific library)
+* It couples the code to the library, but it's a small price to pay for the transparency
+
+3. Logging
+* Log files are still on of the most valuable tools - it's loosely coupled
+* For physical machines - keep logs in a separate drive
+* Apps in containers usually log to stdout (see 12 factor)
+* Logs train people on what is normal app behavior
+* Admins and operations will use logs more frequently than developers
+* If something logged in ERROR/SEVERE required actions - serious system problems (e.g. circuit breaker change)
+* Errors in business logic or user input should be logged as WARNING (or not at all)
+* It's better not to log debug in production (method traces, checkpoints, etc.)
+* Logs should be whitten in a structured way - humans should be able to read and understand them easily
+* Messages should include some identifiers (e.g. request ID)
+* Interesting state transitions should be logged
+
+4. Instance Metrics
+* Instance should emit metrics for later analysis
+* Use metric collection libraries
+
+5. Health Checks
+* Reveals the application's internal view or its health (a page or API call)
+* What could be reported in the healthcheck:
+  * The host ip addresses
+  * The version of interpreter
+  * The app version
+  * Whether the instance is accepting work
+  * Statuses of connection pools, caches, and circuit breakers
+
+#### Chapter 9: Interconnect
