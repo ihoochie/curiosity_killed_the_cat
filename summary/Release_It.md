@@ -373,4 +373,57 @@ Examples:
 * The whole point is to slow things down to give humans time to get involved
 * Apply resistance to the unsafe directions (U-shaped curve)
 
+
+### Part 2: Design for Production
+* Operations:
+  * security, availability, capacity, status, communication
+* Control Plane:
+  * system monitoring, deployment, anomaly detection, features
+* Interconnect:
+  * routing, load balancing, failover, traffic management
+* Instances:
+  * services, processes, components, instance monitoring
+* Foundation:
+  * hardware, VMs, IP addresses, physical network
+
 ### Chapter 6: 
+* The ability to restart components, instead of entire servers, is a key concept of recovery-oriented computing
+
+### Chapter 7: Foundations
+* Design for production means thinking about prod issues as first-class concerns
+* It also means designing for people who do operations
+* Considerations:
+  * How is the network structured?
+  * Is there on ore several of them?
+  * Will a machine has NICs on multiple networks for different purposes?
+  * Do machines have long-lasting identities?
+  * Are machines automatically provisioned?
+  * How do we manage images for them?
+
+1. Networking in the Data Center and the Cloud
+* NICs and the Names: there different NICs in the same server
+* DNS name to IP address ia a Many-to-Many relationship
+* Use different networks for different purposes: admin, production, etc.
+* Programming for Multiple Networks: server apps that need to listen on sockets must add configurable properties to define to which interfaces the server should bind
+
+2. Physical Hosts, Virtual Machines, and Containers
+* Physical Hosts:
+  * Philosophy now: load-balance services across enough hosts that the loss of a single host is not a problem.
+  * Each host is as cheap as possible
+  * Exceptions: workloads where large amount of RAM is required, GPU computing
+* Virtual Machines in the Data Center
+  * Almost any resource on the host can be oversubscribed
+  * Make sure apps are not sensitive to the loss or slowdown of any one host
+  * Don't trust the OS clock, use external services if needed
+* Containers in the Data Center
+  * Apps should rely on external storage files, data, or cache
+  * We use special control plane software to operate containers
+  * To handle problems with containers, follow https://12factor.net/
+  * Containers are meant to start and stop rapidly.
+  * Aim for a total startup time of one second
+* VMs in the Cloud
+  * Have worse availability than physical hosts
+  * Ephemeral nature
+  * Use bastion and jumphosts to access individual VMs
+* Containers in the Cloud
+  * The biggest challenge is to connect all the containers together
