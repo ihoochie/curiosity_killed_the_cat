@@ -501,3 +501,160 @@ Examples:
   * Statuses of connection pools, caches, and circuit breakers
 
 #### Chapter 9: Interconnect
+* Traffic management (routing), load balancing, load shedding, and discovery
+* Consul or other discovery service - for large teams
+1. DNS
+* DNS entries - for small teams
+* DNS - just put hostnames in the config
+* Use logical names for services, not physical ones
+* Load balancing with DNS: round robin - the simplest, low-cost
+* Flaws:
+  * if the one of the instances is dwon, it send traffic to it anyway
+  * inappropiate for long-lived connections (apps can cache the IP address)
+* DNS is good at global server load balancing (GSLB)
+* DNS outage can have a massive impact
+* Diversity: don't host them on the same infrastructure
+* Use DNS for services that don't change often
+* "Discovery" is a human process, DNS names supplied in configs
+2. Load Balancing
+* We need LB for horizontally scaled services
+* It's about distributing traffic across multiple instances
+* LB listens on one or more sockets accrose one or more IP addresses - Virtual IPs
+* A pool defines IP addresses of the instances and policies for distributing traffic:
+  * LB algorithm
+  * What health checks to perform
+  * What kind of stickiness to apply
+  * What to do when all instances are down
+* The client shouldn't know about the load balancer involved
+* Underlying services should generate URLs with the DNS name of the VIP rather than the IP address of the instance
+* LB could be software or hardware
+* Squid, HAProxy, Nginx, httpd, etc. - software
+* X-Forwarded-For header - to get the real IP address of the client
+* Hardware LBs provide better capacity and throughput
+* Health checks - on of the most important features
+* Stickiness - to keep the client on the same instance (fits well for stateful services)
+* Stickiness options:
+  * Cookie-based
+  * IP-based
+  * Session-based
+* Content-based routing - to route traffic based on the content of the request (e.g. URL for signups and search requests)
+* LB are integral to the delivery of the system
+3. Demand Control
+* There is no natural protection against a sudden surge in traffic
+* Two strategies: refuse work or scale out
+* Every failing system starts with a queue backing up somewhere
+* Possible queues:
+  * Socket
+  * NIC buffer (read/write)
+  * Listen queue
+  * Provider listen queue
+* So the best thing to do is to refuse work the system can't handle
+* Shed load as early as possible - LB is the ideal place
+* Services can measure their own response time to help with this
+* Also, response time of the downstream services
+* Services should have relatively short listen queues
+* Learn to define the right queue length
+* [PDQ](http://www.perfdynamics.com/Tools/PDQ.html) - a tool for queue length estimation
+4. Network routing
+* Sometimes we need to define preferred routes for traffic
+5. Discovering Services
+* The discovery service is a central repository of information about the services in the system
+* It practical when:
+  * Too many services for DNS management
+  * Highly dynamic environment
+* Two parts of Service Discovery:
+  * Service registration
+  * Service lookup
+* SD is another service, so it's a good idea for clients to cache the results
+* It's better to not use your own discovery service, but use a third-party one - it's more reliable
+6. Migratory Virtual IP Addresses
+* If the app call the service by the VIP, it should be prepared for the case that next TCP packet isn't going to the same interface
+
+#### Chapter 10: Control Plane
+* Every part of the CP is optional - build as much as you need
+* Be careful with automation - it amplifies mistakes (automation goes really fast)
+* System failure, not human error
+1. Development Is Production
+* Be as close to production as possible (e.g. fresh environment for QA from image)
+* Tools and services for development should be treated with production-level SLAs
+2. System-Wide Transparency
+* Start with visibility, use logging, tracing, and metrics to create transparency
+* Collect and index logs to look for general patterns
+* Use configuration, provisioning, and deployment tools to gain leverage
+* Once the system is stabilized and problems are visible, build control mechanisms
+* Two questions to ask:
+  * Are users receiving a good experience?
+  * Is the system creating the economic value we want?
+* Apply RUM ([Real User Monitoring](https://en.wikipedia.org/wiki/Real_user_monitoring)) to the whole system
+* Economic Value: Top line and bottom line
+* Top line: revenue (watch for problems in service related to revenue generation, exceptions, queue length, etc.)
+* Bottom line: cost (infrastructure, operations, etc.)
+* Also questions to ask:
+  * Are there opportunities to increase the top line by improving performance or reducing queues?
+  * Are we going to hit a bottleneck that will prevent us from increasing the top line?
+  * Are the opportunities to increase the bottom line by optimizing services? Can we see places thar are overscaled?
+  * Can we replace slow-performing or large-footprint services with more efficient ones?
+* All the information (graphs, metrics, etc.) should be built from the same data source, but they can be presented from different perspectives
+* Each group can have their own favorite dashboards
+* Logs and stats:
+  * Gather all the data - log and metrics collectors
+  * Push and pull models
+  * Indexing logs for search and analysis
+  * Some information about instances are generated from dedicated programs running on the instances
+  * Metrics can be time-grouped (e.g. 1 minute, 5 minutes, 1 hour, etc.)
+  * Key metrics can change over time
+* What to expose:
+  * Traffic indicators: page requests. transaction counts, concurrent sessions, etc.
+  * Business transactions, for each type: number processed, conversion rate, completion rate
+  * Users: number of users, usage patterns, successful logins
+  * Resource pool health: 
+  * Database connection health
+  * Data consumption
+  * Integration points health: state of circuit breakers, timeouts, response times, number of networks/app errors
+  * Cache health: items in cache, hit rate, cache size
+* All the counters have an implied time component (e.g. number of requests per minute)
+* There could be second range counters (caution signal, the param is approaching the threshold)
+3. Configuration Services
+* They are also services, so they also bound to the constraints of the CAP theorem
+* Make sure instances can start without the configuration service
+* Make sure instances don't stop if the configuration service is down
+* Make sure the configuration service doesn't brake "the world" if it's down
+* Replicate across geographic regions
+4. Provisioning and Deployment Services
+* The deployment tool should be with a package repository
+* Have locations for artifacts that built not from developers' machines
+* Repeatable builds are important so code on local machine works in production, too
+* Canary deployments - to test new versions of the service
+5. Command and Control
+* It's simpler to kill the instance and run a new one, when the instance is needed to be modified
+* But it's not always possible
+* Then we need to have a way to modify the running instance
+  * Reset circuit breakers
+  * Adjust connection pool size and timeouts
+  * Disable a specific outbound integrations
+  * Reload configuration
+  * Start and stop accepting load
+  * Feature toggles
+* Don't build a self-destruct button into your production code
+* The simplest way to give those capabilities - API over HTTP (on different port)
+* But the best interface for long-term operation is command line
+6. The Platform Players
+* It manages resurces and schedules tasks accross multiple computes.
+* It abstracts the underlying infrastructure and presents a friendlier programming model.
+7. The Shopping List
+* Log collection and search
+* Metrics collection and visualization
+* Deployment
+* Configuration service
+* Instance placement
+* Instance and system visualization
+* Scheduling
+* IP, overlay network, firewall, and load route management
+* Autoscaler
+* Alerting and notification
+
+#### Chapter 11: Security
+* It's a complex topic that should be studied separately
+* Look at the [OWASP Top 10](https://owasp.org/www-project-top-ten/) for more information and cheat sheets 
+* Security is an ongoing process, not a one-time event
+* Use the principle of least privilege
