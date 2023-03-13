@@ -23,3 +23,5 @@ My dev/tech/architecture books roadmap
 - [ ] Test-Driven Development with Python: Obey the Testing Goat: Using Django, Selenium, and JavaScript (Harry Percival)
 - [ ] Software Architecture: The Hard Parts: Modern Trade-Off Analyses for Distributed Architectures (Neal Ford, Mark Richards)
 - [ ] Fundamentals of Software Architecture: An Engineering Approach (Mark Richards, Neal Ford)
+- [ ] Domain-Driven Design: Tackling Complexity in the Heart of Software (Eric Evans)
+- [ ] Implementing Domain-Driven Design (Vaughn Vernon)
