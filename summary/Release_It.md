@@ -428,7 +428,7 @@ Examples:
 * Containers in the Cloud
   * The biggest challenge is to connect all the containers together
 
-#### Chapter 8: Processes on Machines
+### Chapter 8: Processes on Machines
 * Every machine needs the right code, configuration, and network connections
 * Vocab:
   * Service
@@ -500,7 +500,7 @@ Examples:
   * Whether the instance is accepting work
   * Statuses of connection pools, caches, and circuit breakers
 
-#### Chapter 9: Interconnect
+### Chapter 9: Interconnect
 * Traffic management (routing), load balancing, load shedding, and discovery
 * Consul or other discovery service - for large teams
 1. DNS
@@ -570,7 +570,7 @@ Examples:
 6. Migratory Virtual IP Addresses
 * If the app call the service by the VIP, it should be prepared for the case that next TCP packet isn't going to the same interface
 
-#### Chapter 10: Control Plane
+### Chapter 10: Control Plane
 * Every part of the CP is optional - build as much as you need
 * Be careful with automation - it amplifies mistakes (automation goes really fast)
 * System failure, not human error
@@ -653,7 +653,7 @@ Examples:
 * Autoscaler
 * Alerting and notification
 
-#### Chapter 11: Security
+### Chapter 11: Security
 * It's a complex topic that should be studied separately
 * Look at the [OWASP Top 10](https://owasp.org/www-project-top-ten/) for more information and cheat sheets 
 * Security is an ongoing process, not a one-time event
