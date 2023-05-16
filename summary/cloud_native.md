@@ -168,3 +168,132 @@ The compound SLA will never be as high as the highest availability of an individ
   * Failure handling
   * Security
   * Tracing and monitoring
+
+### Chapter 4: Working with Data
+* trend - separate datastore for each service
+* Cloud natiive apps characteristics for data:
+  * prefer managed data storages and analytics services
+  * use polyglot persistence, data partitioning, and caching
+  * embrace eventual consistency and use strong consistency only when needed
+  * prefer cloud native databases that scale out, tolerate failures, and optimized for cloud storage
+  * deal with data distributed across multiple datastores
+
+#### Data Storage Systems
+##### Objects, Files, and Disks
+* Prefer object storage for storing file data
+* Object/blob storage:
+  * use it with files whe apps support cloud provider API
+  * It is inexpensive and can store large amounts of data
+
+* File storage:
+  * use it when apps designed to support Network Attached Storage (NAS)
+  * Use it when shares access to files is required
+  * it is more expensive than object storage
+
+* Disk(block) storage:
+  * use it for apps that assume persistent local storage disks, like MongoDB or MySQL
+
+##### Databases
+* Key/value
+  * can be viewed as a very large hash table
+  * generally inexpensive and very scalable
+  * capable or partitioning
+* Document
+  * need to conform to some defined structure
+  * can be queried using SQL-like language
+  * generally don't enforce schema (schema on read)
+* Relational
+  * most popular type of database
+  * enforce schema (schema on write)
+  * support ACID transactions
+  * support SQL
+  * not very scalable
+* Graph
+  * store data in nodes and edges
+  * work well at analyzing relationships between entities
+* Column family
+* Time series
+  * optimized for storing time series data
+  * can be used for storing metrics, logs, and events
+  * commonly used to collect lagre amounts of data in real time from large number of sources
+  * record are small but the number of records is large
+* Search
+  * optimized for searching text
+  * can be used for full-text search, autocomplete, and faceted search
+  * can be used for analytics
+  * near-real-time indexing
+
+##### Streams and Queues
+* store events and messages
+* in an event stream, data is stored as immutable stream of events
+* messaging queues - mutable messages, it's possible to remove messages from the queue
+
+##### Blockchain
+* a distributed ledger that stores transactions in a chain of blocks
+* each block contains a hash of the previous block
+* each block is cryptographically signed
+
+##### Selecting a Datastore
+* Functional requirements:
+  * Data format
+  * Read/write ratio
+  * Data size
+  * Scale and structure (capacity, need of partitioning)
+  * Data relationships (need of complex relationships?)
+  * Consistency model (strong or eventual consistency?)
+  * Schema flexibility
+  * Concurrency (need of pessimistic or optimistic locking?)
+  * Data movement (need to move data between datastores?)
+  * Data life cycle
+  * Change streams (need of CDC?)
+  * Other supported features (need of specific features?)
+* Nonfunctional requirements:
+  * Team experience
+  * Support
+  * Performance and scalability
+  * Reliability (backup and restore features)
+  * Replication
+  * Limits (on size and scale)
+  * Portability
+* Management and cost:
+  * Managed service (use when possible)
+  * Region or cloud provider availability
+  * Licensing
+  * Overall cost
+Track of database popularity: https://db-engines.com/
+
+#### Data in Multiple Datastores
+* Challenges of distributed data:
+  * Data consistency across datastores
+  * Analysis of data in multiple datastores
+  * Backup and restore of the datastores
+
+##### Change Data Capture (CDC)
+* Many databeses offer stream of data change events (change log) with easy-to-consume API.
+* Common use cases:
+  * Data replication
+  * Notifications
+  * Materialized views
+  * Cache invalidation
+  * Auditing
+  * Search
+  * Analytics
+  * Change analytics (near-real-time analytics of data changes)
+  * Legacy data integration
+* Concern - either record the event that something changed when it didn't or miss the event when something did change
+* By using DBs, we can write change or mutation and the log of changes using transaction
+
+##### Write Changes as an Event to a Change log
+* Write changes to a change log as an event and then read the change log and apply changes to the other datastores
+
+##### Transaction Supervisor
+* Use supervisor service to ensure that a transaction is successfully completed or is compensated
+* Useful with external services (eg. writing an order to the system and processing payment)
+* To solve - save the order or cart with status of processing, then make the call to the payment service, and then update the status of the order or cart
+* Could be a simple function that's triggered at a specific time interval
+
+##### Compensating Transactions
+* A logical set of operations need to complete
+* If one fails, the others need to be rolled back
+* Example: save the file and update status in the database
+
