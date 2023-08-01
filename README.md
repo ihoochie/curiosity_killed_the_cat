@@ -10,7 +10,7 @@ My dev/tech/architecture books roadmap
 - [ ] Distributed Systems (Maarten van Steen, Andrew S. Tanenbaum)
 - [ ] Kubernetes Patterns: Reusable Elements for Designing Cloud-Native Applications (Bilgin Ibryam, Roland Huß)
 - [x] Release It!: Design and Deploy Production-Ready Software (Michael T. Nygard) - [summary](https://github.com/ihoochie/curiosity_killed_the_cat/blob/master/summary/Release_It.md)
-- [ ] Designing Data-Intensive Applications: The Big Ideas Behind Reliable, Scalable, and Maintainable Systems (Martin Kleppmann)
+- [x] Designing Data-Intensive Applications: The Big Ideas Behind Reliable, Scalable, and Maintainable Systems (Martin Kleppmann)
 - [ ] Architecting for Scale: How to Maintain High Availability and Manage Risk in the Cloud (Lee Atchison)
 - [ ] Site Reliability Engineering: How Google Runs Production Systems (Betsy Beyer, Chris Jones, Jennifer Petoff, Niall Richard Murphy)
 - [ ] Refactoring: Improving the Design of Existing Code (2nd Edition) (Martin Fowler)
