@@ -6,7 +6,7 @@ My dev/tech/architecture books roadmap
 - [x] Patterns of Enterprise Application Architecture (Martin Fowler)
 - [x] Design Patterns: Elements of Reusable Object-Oriented Software (GoF)
 - [x] Architecture Patterns with Python: Enabling Test-Driven Development, Domain-Driven Design, and Event-Driven Microservices (Harry Percival, Bob Gregory) - [summary](https://github.com/ihoochie/python_arch_patterns)
-- [ ] Cloud Native: Using Containers, Functions, and Data to Build Next-Generation Applications (Boris Scholl, Trent Swanson, Peter Jausovec)
+- [x] Cloud Native: Using Containers, Functions, and Data to Build Next-Generation Applications (Boris Scholl, Trent Swanson, Peter Jausovec)
 - [ ] Distributed Systems (Maarten van Steen, Andrew S. Tanenbaum)
 - [ ] Kubernetes Patterns: Reusable Elements for Designing Cloud-Native Applications (Bilgin Ibryam, Roland Huß)
 - [x] Release It!: Design and Deploy Production-Ready Software (Michael T. Nygard) - [summary](https://github.com/ihoochie/curiosity_killed_the_cat/blob/master/summary/Release_It.md)
